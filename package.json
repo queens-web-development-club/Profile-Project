@@ -1,0 +1,19 @@
+{
+  "name": "profile-project",
+  "version": "1.0.0",
+  "description": "Profile Project for QWeb at Queen's University",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/queens-web-development-club/Profile-Project.git"
+  },
+  "author": "Chris Maltais <chris.maltais@queensu.ca>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/queens-web-development-club/Profile-Project/issues"
+  },
+  "homepage": "https://github.com/queens-web-development-club/Profile-Project#readme"
+}
