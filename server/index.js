@@ -3,7 +3,7 @@ var app = express()
 const port = process.env.PORT || 3000
 
 // Define request response for root
-app.get('/test', (req, res) => {
+app.get('/', (req, res) => {
     res.send("Hello World!")
 })
 
