@@ -4,7 +4,7 @@
   "description": "Profile Project for QWeb at Queen's University",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --forceExit"
   },
   "repository": {
     "type": "git",
@@ -15,5 +15,12 @@
   "bugs": {
     "url": "https://github.com/queens-web-development-club/Profile-Project/issues"
   },
-  "homepage": "https://github.com/queens-web-development-club/Profile-Project#readme"
+  "homepage": "https://github.com/queens-web-development-club/Profile-Project#readme",
+  "devDependencies": {
+    "jest": "^23.6.0"
+  },
+  "dependencies": {
+    "express": "^4.16.4",
+    "supertest": "^3.3.0"
+  }
 }
