@@ -9,10 +9,6 @@ const UserSchema = new Schema({
   userType: {
     type: String
   },
-  username: {
-    type: String,
-    required: true
-  },
   email: {
     type: String,
     required: true
@@ -27,12 +23,6 @@ const UserSchema = new Schema({
   password: {
     type: String,
     required: true
-  },
-  Clubs: {
-    type: Array
-  },
-  Projects: {
-    type: Array
   }
 });
 
