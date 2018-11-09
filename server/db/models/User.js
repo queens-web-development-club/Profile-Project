@@ -7,7 +7,8 @@ const UserSchema = new Schema({
     default: false
   },
   userType: {
-    type: String
+    type: String,
+    default: "general"
   },
   email: {
     type: String,
