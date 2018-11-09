@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
 const keys = require("../strings/keys");
 
-module.exports = function verifyEmail(data) {
+module.exports = function sendVerificationEmail(data) {
   //create email settings
   var transporter = nodemailer.createTransport({
     service: 'gmail',

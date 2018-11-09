@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const port = process.env.PORT || 3000;
 const keys = require("./strings/keys");
+const users = require("./api/users")
 
 //Connect to MLabs Database
 mongoose
@@ -24,6 +25,7 @@ app.use(passport.initialize());
 require("./utils/passport")(passport);
 
 //API routes
+app.use("/api/users",users);
 
 // Listen!
 app.listen(port, () => {

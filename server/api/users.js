@@ -1,65 +1,73 @@
+//packages
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const passport = require("passport");
-const bCrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const jwt_decode = require("jwt-decode");
+const bCrypt = require("bcryptjs");
+//helper functions
 const keys = require("../strings/keys");
-const verifyEmail = require("../emails/verifyEmail")
-const User = require("../db/models/User")
+const sendVerificationEmail = require("../emails/sendVerificationEmail");
+const validateUser = require("../utils/validateUser");
+//user model
+const User = require("../db/models/User");
 
-router.get("/test", (req,res)=>{
-  res.send("test");
-});
-
+//route accepts an email and password, saves in db and calls sendVerificationEmail
 router.post("/email", (req,res)=>{
-  const email = req.body.email;
-  const errors = {};
-  if(email.length=0){
-    errors.email="Please enter an email address";
-    res.status(422).json(errors);
+  //checks for errors in email and password
+  const {email, password } = req.body;
+  const { isValid, errors } = validateUser(req.body);
+  //report errors
+  if (!isValid) {
+  res.status(422).json(errors);
   } else {
-      //check if address is from queens
-      if(false){
-      //if(/^[A-Za-z0-9._%+-]+@queensu\.ca$/.test(email)){
-        errors.email="Please enter a QueensU email address";
+    //check if email is already in use
+    User.findOne({ email: req.body.email }).then(user => {
+      if (user) {
+        errors.email = "Email already being used";
         res.status(422).json(errors);
         console.log(errors);
       } else {
-        //check if email is used already
-        User.findOne({ email: req.body.email }).then(user => {
-          if (user) {
-            errors.email = "Email already being used";
-            res.status(422).json(errors);
-            console.log(errors);
-          } else {
-            //create new user, save email
-            const newUser = new User({
-              email: email
-            }).save()
-            .then(() => {
-              //hash email
-              jwt.sign({ email: email }, keys.secretOrKey, function(err, encryptedEmail) {
-                let signUpLink = `http://localhost:3000/api/users/verify/${encryptedEmail}`
-                const data = {
-                  recipient: email,
-                  link: signUpLink
-                }
-                verifyEmail(data);
+        //create new user, saves email
+        const newUser = new User({
+          email: email,
+          password: password
+        })
+        //hash Password
+        bCrypt.genSalt(10, (err, salt) => {
+          bCrypt.hash(newUser.password, salt, (err, hash) => {
+            if (err) console.log(err);
+            newUser.password = hash
+            newUser
+              .save()
+              .then(()=>{
+                //hash email
+                jwt.sign({ email: email }, keys.secretOrKey, function(err, encryptedEmail) {
+                  //creates unique link with hashed email of user
+                  let signUpLink = `http://localhost:3000/api/users/verify/${encryptedEmail}`
+                  //arguments for mailer function
+                  const data = {
+                    recipient: email,
+                    link: signUpLink
+                  }
+                  //sends email
+                  sendVerificationEmail(data);
+                });
+                res.send("Verification email sent! Please check your spam folder.");
               });
-
-            })
-          }
+          });
         });
       }
-    }
-    res.send("Verification email sent! Please check your spam folder.");
-  });
+    });
+  }
+});
 
 router.get("/verify/:encryptedEmail", (req,res)=>{
+  //decodes hashed email from link
   const email = jwt_decode(req.params.encryptedEmail);
-  User.findOne({email:email}).then(user=>{
+  User.findOne({email: email.email}).then(user=>{
+    //checks if email is already validated
     if(user.verified){
       res.status(400).json({error:"User has already verified account"});
     } else {
@@ -67,13 +75,10 @@ router.get("/verify/:encryptedEmail", (req,res)=>{
       user.save()
           .then(()=>{
             res.status(200);
-          });
+          })
+          .catch(err => {console.log(err)});
     }
   })
-});
-
-router.post("/register", (req,res)=>{
-
 });
 
 module.exports = router;
