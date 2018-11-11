@@ -62,7 +62,7 @@ router.post("/email", (req,res)=>{
     });
   }
 });
-
+//validates email
 router.get("/verify/:encryptedEmail", (req,res)=>{
   //decodes hashed email from link
   const email = jwt_decode(req.params.encryptedEmail);
@@ -74,10 +74,37 @@ router.get("/verify/:encryptedEmail", (req,res)=>{
       user.verified=true;
       user.save()
           .then(()=>{
-            res.status(200);
+            res.status(200).json({
+              success: "User verified",
+              id: user._id
+            });
           })
           .catch(err => {console.log(err)});
     }
+  })
+});
+//finds user by id
+router.get("/current/:userId", (req,res)=>{
+  User.findOne({_id: req.params.userId}, {password: 0}).then((user) => {
+    if (user) {
+      res.status(200).json(user);
+    } else {
+      res.status(404).json({error: "No user found"});
+    }
+  }).catch(err => {
+    console.log(err);
+  })
+});
+//deletes a user
+router.put("/delete/:userId", (req,res)=>{
+  User.deleteOne({_id: req.params.userId}).then((user) => {
+    if (user.n>0){
+      res.status(200).json({success: "User deleted"});
+    } else {
+        res.status(404).json({error: "No user found"});
+    }
+  }).catch(err => {
+    console.log(err);
   })
 });
 
