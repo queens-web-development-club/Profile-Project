@@ -1,7 +1,9 @@
 const Validator = require("validator");
 const isEmpty = require("./is-empty");
+const mongoose = require("mongoose");
+const User = require("../db/models/User");
 
-module.exports = function validateUser(data) {
+module.exports =  function validateUser(data) {
   const errors = {};
 
     data.email = isEmpty(data.email) ? "" : data.email;
@@ -18,6 +20,15 @@ module.exports = function validateUser(data) {
     }
   }
 
+  //Email in use
+  User.findOne({ email: data.email })
+      .then((user) => {
+        if(user) errors.email = "Email already in use";
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+
   //Passwords
   if (Validator.isEmpty(data.password)) {
     errors.password = "Password is required";
@@ -31,7 +42,8 @@ module.exports = function validateUser(data) {
     }
   }
 
-    //returns
+  console.log(errors)
+  //returns
   return {
     errors: errors,
     isValid: isEmpty(errors)
